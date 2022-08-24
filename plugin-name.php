@@ -116,6 +116,7 @@ if ( ! class_exists( 'plugin_name' ) ) {
 			});
 			add_action('add_meta_boxes', 'meta_box_citation', 10, 2);
 			add_action('save_post', 'save_post_box_citation');
+			add_shortcode('mc-citacion', 'short_code_mc_citacion');
 		}
 
 		/**
