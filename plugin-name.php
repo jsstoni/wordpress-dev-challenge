@@ -13,7 +13,7 @@
  * Plugin Name:     Plugin Name
  * Description:     This is a short description of what the plugin does. It's displayed in the WordPress admin area.
  * Version:         0.0.1
- * Author:          Your Name
+ * Author:          Jesus Antonio
  * Author URI:      https://www.example.com
  * License:         GPL-2.0+
  * License URI:     http://www.gnu.org/licenses/gpl-2.0.txt
@@ -82,9 +82,6 @@ if ( ! class_exists( 'plugin_name' ) ) {
 		 * Include required core files
 		 */
 		public function includes() {
-            // Example
-			require_once __DIR__ . '/includes/loader.php';
-
 			// Load custom functions and hooks
 			require_once __DIR__ . '/includes/includes.php';
 		}
@@ -114,6 +111,10 @@ if ( ! class_exists( 'plugin_name' ) ) {
 		 */
 		public function define_actions() {
 			//
+			add_filter("use_block_editor_for_post_type", function() {
+				return false;
+			});
+			add_action('add_meta_boxes', 'meta_box_citation', 10, 2);
 		}
 
 		/**
