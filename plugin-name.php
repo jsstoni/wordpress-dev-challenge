@@ -111,6 +111,7 @@ if ( ! class_exists( 'plugin_name' ) ) {
 		 */
 		public function define_actions() {
 			//
+			register_activation_hook(__FILE__, 'create_wrong_links');
 			add_filter("use_block_editor_for_post_type", function() {
 				return false;
 			});
