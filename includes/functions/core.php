@@ -43,7 +43,8 @@ function short_code_mc_citacion($atts)
     return $content;
 }
 
-function create_wrong_links() {
+function create_wrong_links()
+{
     global $wpdb;
     $table_name = $wpdb->prefix . 'wrong_url';
     $charset_collate = $wpdb->get_charset_collate();
@@ -62,5 +63,32 @@ function create_wrong_links() {
 
 function admin_menu_url()
 {
-    echo "MENU INFO";
+    var_dump(get_option('hora'));
+}
+
+function cron_active()
+{
+    if( ! wp_next_scheduled( 'cron_hook' ) ) {
+        wp_schedule_event( time(), '60seconds', 'cron_hook' );
+    }
+}
+
+add_action('cron_hook', 'get_all_url');
+
+function get_all_url()
+{
+    update_option('hora', time());
+}
+
+function wp_cron_schedules($schedules) {
+    $schedules['60seconds'] = array(
+        'interval' => 60,
+        'display'  => '60 segundos'
+    );
+     return $schedules;
+}
+
+function deactivation_cron()
+{
+    wp_clear_scheduled_hook( 'cron_hook' );
 }
