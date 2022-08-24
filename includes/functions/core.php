@@ -14,3 +14,9 @@ function box_editor($post) {
 
     wp_editor( $content, 'citation_id', array('textarea_rows' => 3, 'media_buttons' => true, 'tinymce' => true) );
 }
+
+function save_post_box_citation($post_id) {
+    if (isset($_POST['citation_id'])) {
+        update_post_meta($post_id, 'citation_id', sanitize_text_field($_POST['citation_id']));
+    }
+}
