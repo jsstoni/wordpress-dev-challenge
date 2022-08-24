@@ -4,7 +4,7 @@ if ( ! defined('ABSPATH') ) {
     die('Direct access not permitted.');
 }
 
-function meta_box_citation($post_type, $post)
+function meta_box_citation()
 {
     add_meta_box('citation_box_id', __( 'Citation' ), 'box_editor', 'post', 'normal', 'default');
 }
@@ -34,4 +34,9 @@ function short_code_mc_citacion($atts)
 
     $content = get_post_meta($atts['post_id'], 'citation_id', true);
     return $content;
+}
+
+function admin_menu_url()
+{
+    echo "URL ERRROS";
 }

@@ -114,9 +114,10 @@ if ( ! class_exists( 'plugin_name' ) ) {
 			add_filter("use_block_editor_for_post_type", function() {
 				return false;
 			});
-			add_action('add_meta_boxes', 'meta_box_citation', 10, 2);
+			add_action('add_meta_boxes', 'meta_box_citation');
 			add_action('save_post', 'save_post_box_citation');
 			add_shortcode('mc-citacion', 'short_code_mc_citacion');
+			add_action( 'admin_menu', array($this, 'define_menus') );
 		}
 
 		/**
@@ -124,6 +125,15 @@ if ( ! class_exists( 'plugin_name' ) ) {
 		 */
 		public function define_menus() {
             //
+            add_menu_page(
+		        __( 'Url Errors' ),
+		        __('URL Errors'),
+		        'manage_options',
+		        'urlerrors',
+		        'admin_menu_url',
+		        '',
+		        8
+		    );
 		}
 	}
 
