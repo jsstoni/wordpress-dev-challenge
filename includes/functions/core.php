@@ -21,7 +21,7 @@ function box_editor($post)
 
 function save_post_box_citation($post_id)
 {
-    if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )  return;
+    if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
 
     if (!isset($_POST['citation_nonce']) || !wp_verify_nonce($_POST['citation_nonce'], 'citation_validate')) return;
 
@@ -63,7 +63,7 @@ function create_wrong_links()
 
 function admin_menu_url()
 {
-    var_dump(get_option('hora'));
+    //Menu
 }
 
 function cron_active()
@@ -73,11 +73,54 @@ function cron_active()
     }
 }
 
-add_action('cron_hook', 'get_all_url');
-
 function get_all_url()
 {
-    update_option('hora', time());
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'wrong_url';
+    $check_old = $wpdb->get_results("SELECT origen FROM {$table_name}", ARRAY_A);
+    
+    $args = array(
+        'post_type' => 'post',
+        'post_status' => 'publish',
+        'numberposts' => -1,
+        'exclude' => array_column($check_old, 'origen')
+    );
+    $posts = array_column(get_posts($args), 'post_content', 'ID');
+
+    $status = "";
+    $data = array();
+    foreach($posts as $ID => $content) {
+        if (preg_match_all('/<a .*?href=.*?"(.*?)"(.|\n)*?>((.|\n)*?)<.*?\/a.*?>/', $content, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $k => $mach) {
+                if (!filter_var($mach[1], FILTER_VALIDATE_URL)) {
+                    $status = "Mal formado";
+                }else if (!preg_match('/^(?:https?\:)\/\//', $mach[1])) {
+                    $status = "No protocolo";
+                }else if (preg_match('/^(?:http?\:)\/\//', $mach[1])) {
+                    $status = "Inseguro";
+                }else {
+                    $ch = curl_init($mach[1]);
+                    curl_setopt($ch, CURLOPT_HEADER, true);
+                    curl_setopt($ch, CURLOPT_NOBODY, true);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                    $output = curl_exec($ch);
+                    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    if ($httpcode != 200) {
+                        $status = "{$httpcode} Not found";
+                    }else {
+                        continue;
+                    }
+                }
+                $wpdb->insert( $table_name, array(
+                    'url' => $mach[1],
+                    'estado' => $status,
+                    'origen' => $ID)
+                );
+            }
+        }
+    }
 }
 
 function wp_cron_schedules($schedules) {

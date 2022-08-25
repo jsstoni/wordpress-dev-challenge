@@ -114,6 +114,7 @@ if ( ! class_exists( 'plugin_name' ) ) {
 			register_activation_hook(__FILE__, 'create_wrong_links');
 			register_activation_hook( __FILE__, 'cron_active' );
 			add_action('init',  'cron_active');
+			add_action('cron_hook', 'get_all_url');
 			add_filter("use_block_editor_for_post_type", function() {
 				return false;
 			});
