@@ -4,21 +4,31 @@ if ( ! defined('ABSPATH') ) {
     die('Direct access not permitted.');
 }
 
+/**
+ * Add citation editor
+ * */
 function meta_box_citation()
 {
     add_meta_box('citation_box_id', __( 'Citation' ), 'box_editor', 'post', 'normal', 'default');
 }
 
+/**
+ * @param object $post WP_Post get post object
+ * @return void
+ * */
 function box_editor($post)
 {
     $content = get_post_meta($post->ID, 'citation', true);
     wp_nonce_field("citation_validate", "citation_nonce");
 
-    var_dump(get_option('wrong_urls'));
-
     wp_editor( $content, 'citation', array('textarea_rows' => 3, 'media_buttons' => true, 'tinymce' => true) );
 }
 
+/** 
+ * save post citation
+ * @param int $post_id identifier of the publication to save
+ * @return void
+ * */
 function save_post_box_citation($post_id)
 {
     if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
@@ -30,6 +40,11 @@ function save_post_box_citation($post_id)
     }
 }
 
+/**
+ * shortcode [mc-citation post_id="1025"] or [mc-citation] show snippet of a post citation
+ * @param array $atts all shortcode attributes
+ * @return (mixed) citation content
+ * */
 function short_code_mc_citacion($atts)
 {
     $post = get_post();
@@ -43,6 +58,10 @@ function short_code_mc_citacion($atts)
     return $content;
 }
 
+/**
+ * When activating the plugin, a table is created for the broken links
+ * @return void
+ * */
 function create_wrong_links()
 {
     global $wpdb;
@@ -61,11 +80,19 @@ function create_wrong_links()
     dbDelta( $sql );
 }
 
+/**
+ * menu view for bad links
+ * @return void
+ * */
 function admin_menu_url()
 {
-    //Menu
+    //MENU
 }
 
+/**
+ * activate the cronjob to fulfill the function
+ * @return void
+ * */
 function cron_active()
 {
     if( ! wp_next_scheduled( 'cron_hook' ) ) {
@@ -73,12 +100,19 @@ function cron_active()
     }
 }
 
+/**
+ * function used to obtain all the url according to the error pattern
+ * @return void
+ * */
 function get_all_url()
 {
     global $wpdb;
     $table_name = $wpdb->prefix . 'wrong_url';
+
+    //get the id of the already analyzed post
     $check_old = $wpdb->get_results("SELECT origen FROM {$table_name}", ARRAY_A);
     
+    //get all posts except the ones that were already parsed
     $args = array(
         'post_type' => 'post',
         'post_status' => 'publish',
@@ -113,6 +147,8 @@ function get_all_url()
                         continue;
                     }
                 }
+
+                //insert link information with error found
                 $wpdb->insert( $table_name, array(
                     'url' => $mach[1],
                     'estado' => $status,
@@ -123,6 +159,11 @@ function get_all_url()
     }
 }
 
+/** 
+ * lista de horarios
+ * @param array $scedules list of schedules
+ * @return array Filtered array of non-default cron schedules.
+ * */
 function wp_cron_schedules($schedules) {
     $schedules['60seconds'] = array(
         'interval' => 60,
@@ -131,6 +172,10 @@ function wp_cron_schedules($schedules) {
      return $schedules;
 }
 
+/**
+ * disable the cronjob
+ * @return void
+ * */
 function deactivation_cron()
 {
     wp_clear_scheduled_hook( 'cron_hook' );
