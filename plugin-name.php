@@ -121,7 +121,6 @@ if ( ! class_exists( 'plugin_name' ) ) {
 			add_action('add_meta_boxes', 'meta_box_citation');
 			add_action('save_post', 'save_post_box_citation');
 			add_shortcode('mc-citacion', 'short_code_mc_citacion');
-			add_filter('cron_schedules', 'wp_cron_schedules', 10, 1);
 			register_deactivation_hook( __FILE__, 'deactivation_cron' );
 			add_action('admin_menu', array($this, 'define_menus'));
 		}

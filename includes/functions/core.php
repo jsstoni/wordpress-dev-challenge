@@ -86,7 +86,12 @@ function create_wrong_links()
  * */
 function admin_menu_url()
 {
-    //MENU
+    $Table_Wrong_Url = new Table_Wrong_Url();
+?>
+    <h1>Wrong Links</h1>
+<?php
+    $Table_Wrong_Url->prepare_items();
+    $Table_Wrong_Url->display();
 }
 
 /**
@@ -96,7 +101,7 @@ function admin_menu_url()
 function cron_active()
 {
     if( ! wp_next_scheduled( 'cron_hook' ) ) {
-        wp_schedule_event( time(), '60seconds', 'cron_hook' );
+        wp_schedule_event( time(), 'hourly', 'cron_hook' );
     }
 }
 
@@ -159,24 +164,14 @@ function get_all_url()
     }
 }
 
-/** 
- * lista de horarios
- * @param array $scedules list of schedules
- * @return array Filtered array of non-default cron schedules.
- * */
-function wp_cron_schedules($schedules) {
-    $schedules['60seconds'] = array(
-        'interval' => 60,
-        'display'  => '60 segundos'
-    );
-     return $schedules;
-}
-
 /**
  * disable the cronjob
  * @return void
  * */
 function deactivation_cron()
 {
+    global $wpdb;
     wp_clear_scheduled_hook( 'cron_hook' );
+    $table_name = $wpdb->prefix . 'wrong_url';
+    $wpdb->query("DROP TABLE IF EXISTS {$table_name}");
 }
