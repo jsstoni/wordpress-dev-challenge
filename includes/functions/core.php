@@ -170,8 +170,5 @@ function get_all_url()
  * */
 function deactivation_cron()
 {
-    global $wpdb;
     wp_clear_scheduled_hook( 'cron_hook' );
-    $table_name = $wpdb->prefix . 'wrong_url';
-    $wpdb->query("DROP TABLE IF EXISTS {$table_name}");
 }
